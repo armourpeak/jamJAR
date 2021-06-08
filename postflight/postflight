@@ -159,12 +159,17 @@ def process_installs(jamjar_installs, installed_items):
                 if item['status'] == 0:
                     if item['name'] in jamjar_installs:
                         for _ in MANAGED_INSTALL_REPORT.get('ManagedInstalls'):
-                            if not 'category' in _: #item not categorized, just display a message
-                                send_installed_notification(item['display_name'], item['version'])
-                            else: 
-                                if not _['category'] in NO_MSG_CATEGORY: # item is categorized, but is our secret category
-                                    send_installed_notification(item['display_name'], item['version'])
-                           # send_installed_notification(item['display_name'], item['version'])
+                            #logging.info('%s', _['name'])
+                            if 'category' in _:
+                                # We have a category key
+                               # logging.info('Name: %s, Category: %s', (_['name']), (_['category']))
+                                if _['category'] != NO_MSG_CATEGORY:
+                                    # Category is not our secret category
+                                    #logging.info('Category is not our secret category')
+                                    send_installed_notification(_['display_name'], item['version'])
+                            else:
+                                send_installed_notification(_['display_name'], item['version'])
+                                #logging.info('Posting note: %s', (_['name']))
                         jamjar_installs.remove(item['name'])
                         installed_items += 1
 
@@ -176,6 +181,7 @@ def process_installs(jamjar_installs, installed_items):
                     jamjar_installs.remove(item)
 
     return (jamjar_installs, installed_items)
+
 
 
 def process_uninstalls(jamjar_uninstalls, removed_items):
